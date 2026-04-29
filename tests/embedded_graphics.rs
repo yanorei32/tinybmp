@@ -5,7 +5,7 @@ use embedded_graphics::{
     prelude::*,
     primitives::Rectangle,
 };
-use tinybmp::{Bmp, RowOrder};
+use tinybmp::{Bmp, RawBmp, RowOrder};
 
 #[test]
 fn negative_top_left() {
@@ -29,6 +29,34 @@ fn dimensions() {
         image.bounding_box(),
         Rectangle::new(Point::new(100, 200), Size::new(4, 4))
     );
+}
+
+#[test]
+fn bytes_per_row() {
+    const fn stride(width: usize, bpp: usize) -> usize {
+        // Formula from <https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader#calculating-surface-stride>.
+        ((width * bpp + 31) & !31) >> 3
+    }
+
+    #[rustfmt::skip]
+    const TESTS: &[(&[u8], u32, Option<usize>)] = &[
+        (include_bytes!("stride-1px-32bpp.bmp"), 1, Some(stride(1, 32))),
+        (include_bytes!("stride-3px-24bpp.bmp"), 3, Some(stride(3, 24))),
+        (include_bytes!("stride-5px-16bpp-rgb565-bitfields.bmp"), 5, Some(stride(5, 16))),
+        (include_bytes!("stride-7px-8bpp.bmp"), 7, Some(stride(7, 8))),
+        (include_bytes!("stride-9px-4bpp.bmp"), 9, Some(stride(9, 4))),
+        (include_bytes!("stride-11px-1bpp.bmp"), 11, Some(stride(11, 1))),
+        (include_bytes!("logo-indexed-8bpp-rle8.bmp"), 240, None),
+        (include_bytes!("logo-indexed-4bpp-rle4.bmp"), 240, None),
+    ];
+
+    for &(file, width, bytes_per_row) in TESTS {
+        let image = RawBmp::from_slice(file).unwrap();
+        let header = image.header();
+
+        assert_eq!(header.image_size.width, width);
+        assert_eq!(header.bytes_per_row(), bytes_per_row);
+    }
 }
 
 fn expected_image_color<C>() -> MockDisplay<C>

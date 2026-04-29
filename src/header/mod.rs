@@ -158,13 +158,29 @@ impl Header {
         ))
     }
 
-    /// Returns the row length in bytes.
+    /// [`Self::bytes_per_row`] without checking the compression.
     ///
-    /// Each row in a BMP file is a multiple of 4 bytes long.
-    pub(crate) const fn bytes_per_row(&self) -> usize {
+    /// Only returns useful values for uncompressed formats.
+    pub(crate) const fn bytes_per_row_uncompressed(&self) -> usize {
         let bits_per_row = self.image_size.width as usize * self.bpp.bits() as usize;
 
         (bits_per_row + 31) / 32 * (32 / 8)
+    }
+
+    /// Calculates the row length in bytes for uncompressed BMP files.
+    ///
+    /// This value, which is also called the stride, is the advancement from one
+    /// row to the next and may include padding bytes. It is determined by
+    /// multiplying the width of the image with the number of bytes per pixel
+    /// and rounding the result up to the next 4-byte boundary.
+    ///
+    /// Returns `None` for compressed formats where the row lengths vary.
+    pub const fn bytes_per_row(&self) -> Option<usize> {
+        if self.compression_method.is_compressed() {
+            None
+        } else {
+            Some(self.bytes_per_row_uncompressed())
+        }
     }
 }
 
@@ -238,5 +254,14 @@ impl CompressionMethod {
     const fn parse(input: &[u8]) -> Result<(&[u8], Self), ParseError> {
         let (input, value) = try_const!(le_u32(input));
         Ok((input, try_const!(Self::new(value))))
+    }
+
+    /// Returns `true` if a BMP using this compression method is in fact
+    /// compressed.
+    pub const fn is_compressed(&self) -> bool {
+        match self {
+            Self::Rgb | Self::Bitfields => false,
+            Self::Rle8 | Self::Rle4 => true,
+        }
     }
 }

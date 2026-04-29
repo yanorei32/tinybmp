@@ -6,6 +6,10 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- [#55](https://github.com/embedded-graphics/tinybmp/pull/55) Added methods `CompressionMethod::is_compressed` and `Header::bytes_per_row`. The latter is essential information when walking through the bytes yourself.
+
 ## [0.7.0] - 2026-01-14
 
 ### Fixed

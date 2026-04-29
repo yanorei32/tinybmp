@@ -55,7 +55,7 @@ impl<'a> RawBmp<'a> {
             // so we should calculate width x height instead.
             let height = header.image_size.height as usize;
 
-            let Some(data_length) = header.bytes_per_row().checked_mul(height) else {
+            let Some(data_length) = header.bytes_per_row_uncompressed().checked_mul(height) else {
                 return Err(ParseError::UnexpectedEndOfFile);
             };
             data_length
@@ -139,7 +139,9 @@ impl<'a> RawBmp<'a> {
         // The specialized implementations of `Iterator::nth` for `Chunks` and
         // `RawDataSlice::IntoIter` are `O(1)`, which also makes this method `O(1)`.
 
-        let mut row_chunks = self.image_data.chunks_exact(self.header.bytes_per_row());
+        let mut row_chunks = self
+            .image_data
+            .chunks_exact(self.header.bytes_per_row_uncompressed());
         let row = match self.header.row_order {
             RowOrder::BottomUp => row_chunks.nth_back(p.y as usize),
             RowOrder::TopDown => row_chunks.nth(p.y as usize),

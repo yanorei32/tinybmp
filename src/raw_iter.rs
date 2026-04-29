@@ -34,7 +34,9 @@ where
         let width = header.image_size.width as usize;
 
         Self {
-            rows: raw_bmp.image_data().chunks_exact(header.bytes_per_row()),
+            rows: raw_bmp
+                .image_data()
+                .chunks_exact(header.bytes_per_row_uncompressed()),
             row_order: raw_bmp.header().row_order,
             current_row: RawDataSlice::new(&[]).into_iter().take(0),
             width,
