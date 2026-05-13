@@ -12,7 +12,7 @@
 
 ### Fixed
 
-- Fixed RLE4/RLE8 compressed BMP pixel iterator returning only the first row of pixels instead of all pixels.
+- [#57](https://github.com/embedded-graphics/tinybmp/pull/57) Fixed RLE4/RLE8 compressed BMP pixel iterator returning only the first row of pixels instead of all pixels.
 
 ## [0.7.0] - 2026-01-14
 
