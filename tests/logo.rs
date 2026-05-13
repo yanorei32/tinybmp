@@ -169,7 +169,8 @@ fn logo_indexed_4bpp_rle4() {
 
 #[test]
 fn logo_indexed_4bpp_rle4_pixel_iteration() {
-    let bmp: Bmp<'_, Bgr888> = Bmp::from_slice(include_bytes!("logo-indexed-4bpp-rle4.bmp")).unwrap();
+    let bmp: Bmp<'_, Bgr888> =
+        Bmp::from_slice(include_bytes!("logo-indexed-4bpp-rle4.bmp")).unwrap();
     assert_eq!(bmp.pixels().count(), WIDTH * HEIGHT);
 }
 
@@ -213,7 +214,8 @@ fn logo_indexed_8bpp_rle8() {
 
 #[test]
 fn logo_indexed_8bpp_rle8_pixel_iteration() {
-    let bmp: Bmp<'_, Bgr888> = Bmp::from_slice(include_bytes!("logo-indexed-8bpp-rle8.bmp")).unwrap();
+    let bmp: Bmp<'_, Bgr888> =
+        Bmp::from_slice(include_bytes!("logo-indexed-8bpp-rle8.bmp")).unwrap();
     assert_eq!(bmp.pixels().count(), WIDTH * HEIGHT);
 }
 
